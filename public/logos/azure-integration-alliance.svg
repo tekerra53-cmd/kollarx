@@ -1,0 +1,7 @@
+<svg width="220" height="72" viewBox="0 0 220 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="220" height="72" rx="18" fill="white"/>
+  <path d="M29 17L45 55H35L31.6 46.2H18.5L15.1 55H5L21 17H29ZM25 30L21.8 38.7H28.2L25 30Z" fill="#103678"/>
+  <circle cx="46" cy="24" r="5" fill="#74B4D9"/>
+  <text x="62" y="30" fill="#74B4D9" font-family="Manrope, Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="1.8">AZURE</text>
+  <text x="62" y="47" fill="#103678" font-family="Manrope, Arial, sans-serif" font-size="14" font-weight="600">Integration Alliance</text>
+</svg>

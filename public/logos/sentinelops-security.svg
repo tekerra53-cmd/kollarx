@@ -1,0 +1,7 @@
+<svg width="220" height="72" viewBox="0 0 220 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="220" height="72" rx="18" fill="white"/>
+  <path d="M25 15L42 21V35C42 45 34.8 51.8 25 55C15.2 51.8 8 45 8 35V21L25 15Z" fill="#103678"/>
+  <path d="M25 24L30.3 34.2L25 47L19.7 34.2L25 24Z" fill="#74B4D9"/>
+  <text x="56" y="30" fill="#103678" font-family="Manrope, Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="1.6">SENTINELOPS</text>
+  <text x="56" y="47" fill="#103678" font-family="Manrope, Arial, sans-serif" font-size="14" font-weight="600">Security</text>
+</svg>

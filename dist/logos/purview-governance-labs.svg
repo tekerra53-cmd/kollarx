@@ -1,0 +1,7 @@
+<svg width="220" height="72" viewBox="0 0 220 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="220" height="72" rx="18" fill="white"/>
+  <rect x="10" y="18" width="34" height="34" rx="10" fill="#103678"/>
+  <path d="M20 27H30.5C35.2 27 38 29.2 38 33.4C38 37.6 35.2 40 30.5 40H25V46H20V27ZM25 31V36H29.7C31.6 36 32.9 35.2 32.9 33.5C32.9 31.8 31.6 31 29.7 31H25Z" fill="white"/>
+  <text x="57" y="30" fill="#74B4D9" font-family="Manrope, Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="1.6">PURVIEW</text>
+  <text x="57" y="47" fill="#103678" font-family="Manrope, Arial, sans-serif" font-size="14" font-weight="600">Governance Labs</text>
+</svg>

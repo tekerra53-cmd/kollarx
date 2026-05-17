@@ -1,0 +1,7 @@
+<svg width="220" height="72" viewBox="0 0 220 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="220" height="72" rx="18" fill="white"/>
+  <path d="M14 43C14 36.4 19.4 31 26 31C27.7 31 29.3 31.3 30.7 32C33 27.2 37.8 24 43.3 24C51.1 24 57.4 30.3 57.4 38.1C57.4 38.5 57.4 39 57.3 39.4C61.3 40.2 64.3 43.7 64.3 47.9C64.3 52.7 60.4 56.6 55.6 56.6H27C19.8 56.6 14 50.8 14 43Z" fill="#74B4D9"/>
+  <path d="M34 36L39 41H35.4V47H32.6V41H29L34 36Z" fill="#103678"/>
+  <text x="75" y="30" fill="#103678" font-family="Manrope, Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="1.6">CLOUDROUTE</text>
+  <text x="75" y="47" fill="#103678" font-family="Manrope, Arial, sans-serif" font-size="14" font-weight="600">Migration Group</text>
+</svg>
