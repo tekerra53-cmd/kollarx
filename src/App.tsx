@@ -13,7 +13,6 @@ import {
   ChevronRight,
   Cloud,
   Clock3,
-  CreditCard,
   Filter,
   Headset,
   LayoutDashboard,
@@ -159,89 +158,10 @@ function createMemberCode() {
 }
 
 const seededState: PlatformState = {
-  users: [
-    {
-      id: "admin-1",
-      memberCode: "K-53522",
-      fullName: "KollraX Admin",
-      email: "admin@kollrax.com",
-      password: "Admin@123",
-      company: "KollraX",
-      role: "admin",
-      avatar: null,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: "client-1",
-      memberCode: "K-78215",
-      fullName: "Elena Watson",
-      email: "elena@northbridge.co",
-      password: "Client@123",
-      company: "Northbridge Partners",
-      role: "client",
-      avatar: null,
-      createdAt: new Date().toISOString(),
-    },
-  ],
-  tickets: [
-    {
-      id: "TK-1001",
-      userId: "client-1",
-      subject: "Microsoft 365 migration planning",
-      category: "Service Request",
-      priority: "High",
-      message: "Need a staged migration approach for 140 users across three regions.",
-      status: "In Progress",
-      createdAt: new Date(Date.now() - 172800000).toISOString(),
-      updates: [
-        {
-          by: "KollraX Admin",
-          role: "admin",
-          message: "Discovery workshop has been scheduled for Thursday 10:00 AM.",
-          createdAt: new Date(Date.now() - 86400000).toISOString(),
-        },
-      ],
-    },
-  ],
-  leads: [
-    {
-      id: "LD-3001",
-      name: "Riley Henderson",
-      email: "riley@altitudebio.io",
-      phone: "+234 801 234 5678",
-      company: "Altitude Bio",
-      staffSize: "51-200",
-      usesMicrosoft365: "Yes",
-      needs: ["Security", "Ongoing support"],
-      budgetRange: "₦2m - ₦5m",
-      urgency: "This week",
-      focus: "Security and compliance",
-      message: "We need compliance hardening and managed support for a regulated team.",
-      stage: "Contacted",
-      owner: "Collins",
-      createdAt: new Date(Date.now() - 259200000).toISOString(),
-    },
-  ],
-  services: [
-    {
-      id: "starter-plan",
-      title: "Starter Plan",
-      description: "₦50,000/month for small businesses with basic Microsoft 365 admin and email support.",
-      enabled: true,
-    },
-    {
-      id: "business-plan",
-      title: "Business Plan",
-      description: "₦100,000/month for growing teams that need tenant management, baseline security, and faster support.",
-      enabled: true,
-    },
-    {
-      id: "enterprise-plan",
-      title: "Enterprise Plan",
-      description: "₦250,000/month+ for larger organizations that need compliance, migration support, and priority SLA coverage.",
-      enabled: true,
-    },
-  ],
+  users: [],
+  tickets: [],
+  leads: [],
+  services: [],
 };
 
 const PlatformContext = createContext<PlatformContextType | undefined>(undefined);
@@ -360,7 +280,7 @@ function PlatformProvider({ children }: { children: ReactNode }) {
       email: payload.email,
       password: payload.password,
       company: payload.company,
-      role: "client",
+      role: state.users.some((user) => user.role === "admin") ? "client" : "admin",
       avatar: null,
       createdAt: new Date().toISOString(),
     };
@@ -855,11 +775,10 @@ function MarketingPage() {
               Microsoft 365 Delivery and Support
             </motion.p>
             <h1 className="mt-6 max-w-4xl text-5xl font-semibold leading-[1.02] tracking-[-0.05em] text-[#103678] sm:text-6xl xl:text-[4.1rem]">
-              Enterprise Microsoft 365 operations with the clarity of a modern SaaS platform.
+             We manage your Microsoft 365 so your team can work securely and without downtime.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-[#103678]/72 sm:text-lg">
-              KollraX helps organizations plan migrations, strengthen governance, and run modern workplace services
-              with the structure, visibility, and support expected from an enterprise partner.
+              We handle migrations, security, and day-to-day Microsoft 365 operations — so your business runs faster, safer, and without stress.
             </p>
             <motion.div
               initial={{ opacity: 0, y: 14 }}
@@ -889,10 +808,10 @@ function MarketingPage() {
               ))}
             </div>
             <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 text-xs uppercase tracking-[0.2em] text-[#103678]/48">
-              <span>Northbridge Partners</span>
-              <span>Meridian Logistics</span>
-              <span>Arvon Capital</span>
-              <span>Norfield Energy</span>
+              <span>Financial Services</span>
+              <span>Logistics Teams</span>
+              <span>Professional Services</span>
+              <span>Energy Operations</span>
             </div>
           </div>
 
@@ -1199,17 +1118,17 @@ function MarketingPage() {
               {
                 quote:
                   "KollraX made our Microsoft 365 migration predictable and secure. We moved 300+ users with no major downtime.",
-                author: "CTO, Meridian Logistics",
+                author: "Technology Lead",
               },
               {
                 quote:
                   "Their support model feels like an extension of our internal IT organization. Response quality is consistently high.",
-                author: "Operations Director, Arvon Capital",
+                author: "Operations Director",
               },
               {
                 quote:
                   "From Teams governance to compliance controls, KollraX gave us a platform we can trust under pressure.",
-                author: "Head of Technology, Norfield Energy",
+                author: "Head of Technology",
               },
             ].map((item, index) => (
               <motion.div
@@ -1691,7 +1610,7 @@ function LoginPage() {
     const data = new FormData(event.currentTarget);
     const role = login(String(data.get("email")), String(data.get("password")));
     if (!role) {
-      setError("Invalid credentials. Try admin@kollrax.com / Admin@123 for demo admin.");
+      setError("Invalid credentials. Check your email and password, or create the first admin account.");
       return;
     }
     if (role !== "admin") {
@@ -2407,13 +2326,16 @@ function AdminNavItem({
   icon: Icon,
   label,
   active = false,
+  onClick,
 }: {
   icon: typeof User;
   label: string;
   active?: boolean;
+  onClick?: () => void;
 }) {
   return (
     <button
+      onClick={onClick}
       className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm transition ${
         active
           ? "border border-[#74b4d9]/45 bg-[linear-gradient(135deg,rgba(116,180,217,0.24),rgba(255,255,255,0.9))] text-[#103678] shadow-[0_16px_34px_rgba(116,180,217,0.16)]"
@@ -2470,35 +2392,25 @@ function ProgressRow({ label, value, ratio }: { label: string; value: string; ra
   );
 }
 
+type AdminView =
+  | "overview"
+  | "workspace"
+  | "clients"
+  | "testimonials"
+  | "audit-logs"
+  | "notifications"
+  | "activity-monitoring"
+  | "platform-settings";
+
 function AdminDashboard() {
-  const { state, currentUser, updateTicketStatus, addTicketReply, toggleService, updateLeadPipeline } = usePlatform();
-  const contentAreaList = ["Website content", "Testimonials", "FAQs", "Service information", "Announcements", "Blog/news architecture"];
-  const notificationSeed = [
-    "2 high-priority support tickets require admin review.",
-    "One consultation lead needs follow-up assignment today.",
-    "Subscription renewal batch scheduled for tonight at 21:00.",
-  ];
-  const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
-  const [userSearch, setUserSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState<"all" | UserRole>("all");
+  const { state, currentUser } = usePlatform();
   const [adminNotice, setAdminNotice] = useState("");
+  const [activeView, setActiveView] = useState<AdminView>("overview");
   const [collapsedGroups, setCollapsedGroups] = useState({
     primary: false,
     kiretivs: false,
     system: false,
   });
-  const [userRoles, setUserRoles] = useState<Record<string, UserRole>>(
-    Object.fromEntries(state.users.map((user) => [user.id, user.role]))
-  );
-  const [accountStatuses, setAccountStatuses] = useState<Record<string, "Required" | "Review" | "Paused">>(
-    Object.fromEntries(state.users.map((user) => [user.id, user.role === "admin" ? "Review" : "Required"]))
-  );
-  const [consultationStatuses, setConsultationStatuses] = useState<Record<string, LeadStage>>(
-    Object.fromEntries(state.leads.map((lead) => [lead.id, lead.stage]))
-  );
-  const [consultationOwners, setConsultationOwners] = useState<Record<string, string>>(
-    Object.fromEntries(state.leads.map((lead) => [lead.id, lead.owner]))
-  );
   const [paymentStatuses, setPaymentStatuses] = useState<Record<string, "Paid" | "Processing" | "Pending" | "Failed">>({
     "INV-4201": "Paid",
     "INV-4202": "Processing",
@@ -2509,76 +2421,105 @@ function AdminDashboard() {
     "INV-4202": "Premium",
     "INV-4203": "Growth",
   });
-  const [permissionMatrix, setPermissionMatrix] = useState<Record<string, { billing: boolean; support: boolean; content: boolean; system: boolean }>>(
-    Object.fromEntries(
-      state.users.map((user) => [
-        user.id,
-        user.role === "admin"
-          ? { billing: true, support: true, content: true, system: true }
-          : { billing: false, support: true, content: false, system: false },
-      ])
-    )
-  );
-  const [notificationDraft, setNotificationDraft] = useState({
-    title: "",
-    message: "",
-    audience: "All workspace users",
-  });
-  const [sentNotifications, setSentNotifications] = useState(
-    notificationSeed.map((item, index) => ({
-      id: `notice-${index}`,
-      title: `Platform Notice ${index + 1}`,
-      message: item,
-      audience: "Admin feed",
-    }))
-  );
-  const [activeContentArea, setActiveContentArea] = useState(contentAreaList[0]);
-  const [contentEntries, setContentEntries] = useState<Record<string, string>>({
-    "Website content": "Refresh homepage positioning for Microsoft 365 managed operations and enterprise support.",
-    Testimonials: "Highlight recent migration delivery wins and managed support satisfaction notes.",
-    FAQs: "Add billing, onboarding, and compliance workflow questions for enterprise buyers.",
-    "Service information": "Clarify migration, deployment, compliance, and consultation engagement stages.",
-    Announcements: "Prepare admin-controlled platform notices for maintenance windows and release changes.",
-    "Blog/news architecture": "Outline publishing workflow for insights, updates, and thought leadership content.",
-  });
+  const [revenueView, setRevenueView] = useState<"mrr" | "arr" | "clients">("mrr");
+  const [revenueWindow, setRevenueWindow] = useState<"6m" | "12m">("12m");
 
   const activeClients = Array.from(new Set(state.users.filter((user) => user.role === "client").map((user) => user.company))).length;
-  const adminUsers = state.users.filter((user) => user.role === "admin").length;
   const usersWithAvatars = state.users.filter((user) => Boolean(user.avatar)).length;
-  const consultations = state.leads.slice(0, 4);
-  const openConsultations = state.leads.length;
-  const openTicketsCount = state.tickets.filter((ticket) => ticket.status === "Open").length;
-  const inProgressTicketsCount = state.tickets.filter((ticket) => ticket.status === "In Progress").length;
   const enabledServices = state.services.filter((service) => service.enabled).length;
-  const monthlyRecurringRevenue = activeClients * 4200 + state.services.filter((service) => service.enabled).length * 850;
-  const filteredUsers = state.users.filter((user) => {
-    const matchesSearch =
-      user.fullName.toLowerCase().includes(userSearch.toLowerCase()) ||
-      user.email.toLowerCase().includes(userSearch.toLowerCase()) ||
-      user.company.toLowerCase().includes(userSearch.toLowerCase());
-    const matchesRole = roleFilter === "all" ? true : userRoles[user.id] === roleFilter;
-    return matchesSearch && matchesRole;
-  });
+  const monthlyRecurringRevenue = activeClients * 4200 + enabledServices * 850;
 
-  const subscriptionPlans = [
-    { plan: "Enterprise Plan", health: 0.97 },
-    { plan: "Business Plan", health: 0.61 },
-    { plan: "Starter Plan", health: 0.48 },
-  ];
-  const chartValues = [0.18, 0.42, 0.34, 0.47, 0.62, 0.41, 0.73, 0.68, 0.79, 0.98];
-  const chartLabels = ["Jan", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov"];
-  const chartPoints = chartValues.map((value, index) => {
-    const x = index * 52 + 24;
-    const y = 148 - value * 112;
-    return `${x},${y}`;
-  });
-  const chartPath = chartPoints
-    .map((point, index) => {
-      const [x, y] = point.split(",");
-      return `${index === 0 ? "M" : "L"} ${x} ${y}`;
-    })
-    .join(" ");
-  const chartAreaPath = `${chartPath} L ${24 + (chartValues.length - 1) * 52} 160 L 24 160 Z`;
+  const subscriptionPlans = state.services.map((service) => ({
+    plan: service.title,
+    health: service.enabled ? 1 : 0,
+  }));
+  const revenueChart = useMemo(() => {
+    const windowSize = revenueWindow === "12m" ? 12 : 6;
+    const spacing = windowSize === 12 ? 42 : 84;
+    const startX = 24;
+    const baseMrr = Math.max(monthlyRecurringRevenue, 1);
+    const currentArr = baseMrr * 12;
+    const currentClients = Math.max(activeClients, 1);
+    const growthFactors = revenueWindow === "12m"
+      ? [0.58, 0.61, 0.65, 0.69, 0.72, 0.76, 0.81, 0.86, 0.9, 0.94, 0.98, 1]
+      : [0.71, 0.76, 0.82, 0.89, 0.95, 1];
+
+    const monthFormatter = new Intl.DateTimeFormat(undefined, { month: "short" });
+    const labels = Array.from({ length: windowSize }, (_, index) => {
+      const date = new Date();
+      date.setMonth(date.getMonth() - (windowSize - 1 - index));
+      return monthFormatter.format(date);
+    });
+
+    const mrrSeries = growthFactors.map((factor, index) => ({
+      label: labels[index],
+      value: Math.round(baseMrr * factor),
+    }));
+    const arrSeries = growthFactors.map((factor, index) => ({
+      label: labels[index],
+      value: Math.round(currentArr * factor),
+    }));
+    const clientSeries = growthFactors.map((factor, index) => ({
+      label: labels[index],
+      value: Math.max(1, Math.round(currentClients * factor)),
+    }));
+
+    const seriesMap = {
+      mrr: {
+        label: "Monthly recurring revenue",
+        amountLabel: "MRR",
+        values: mrrSeries,
+        formatter: (value: number) => formatCurrency(value),
+      },
+      arr: {
+        label: "Annual recurring revenue",
+        amountLabel: "ARR",
+        values: arrSeries,
+        formatter: (value: number) => formatCurrency(value),
+      },
+      clients: {
+        label: "Active client accounts",
+        amountLabel: "Clients",
+        values: clientSeries,
+        formatter: (value: number) => `${value} accounts`,
+      },
+    } as const;
+
+    const selected = seriesMap[revenueView];
+    const values = selected.values.map((item) => item.value);
+    const maxValue = Math.max(...values);
+    const minValue = Math.min(...values);
+    const range = Math.max(maxValue - minValue, 1);
+    const points = selected.values.map((item, index) => {
+      const x = startX + index * spacing;
+      const normalized = (item.value - minValue) / range;
+      const y = 148 - normalized * 104;
+      return { ...item, x, y };
+    });
+    const path = points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
+    const areaPath = `${path} L ${points[points.length - 1]?.x ?? startX} 160 L ${startX} 160 Z`;
+    const latestPoint = selected.values[selected.values.length - 1];
+    const previousPoint = selected.values[selected.values.length - 2] ?? latestPoint;
+    const deltaValue = latestPoint.value - previousPoint.value;
+    const deltaPercent = previousPoint.value === 0 ? 0 : (deltaValue / previousPoint.value) * 100;
+
+    return {
+      ...selected,
+      points,
+      path,
+      areaPath,
+      labels,
+      minValue,
+      maxValue,
+      deltaValue,
+      deltaPercent,
+    };
+  }, [activeClients, monthlyRecurringRevenue, revenueView, revenueWindow]);
+  const [activeRevenuePoint, setActiveRevenuePoint] = useState(revenueChart.points.length - 1);
+  useEffect(() => {
+    setActiveRevenuePoint(revenueChart.points.length - 1);
+  }, [revenueChart.points.length, revenueView, revenueWindow]);
+  const selectedRevenuePoint = revenueChart.points[Math.min(activeRevenuePoint, revenueChart.points.length - 1)] ?? revenueChart.points[0];
 
   const recentActivities = state.tickets
     .flatMap((ticket) =>
@@ -2590,49 +2531,65 @@ function AdminDashboard() {
     )
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
-  const newestUsers = state.users
-    .slice()
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 3);
-  const paymentRecords = [
-    { id: "INV-4201", client: "Northbridge Partners", gateway: "Paystack", amount: 4200, status: "Paid" },
-    { id: "INV-4202", client: "Altitude Bio", gateway: "Flutterwave", amount: 6850, status: "Processing" },
-    { id: "INV-4203", client: "KollraX Premium", gateway: "Paystack", amount: 2750, status: "Pending" },
-  ];
-  const notificationItems = notificationSeed;
+  const paymentRecords: Array<{ id: string; client: string; gateway: string; amount: number }> = [];
   const permissionItems = [
     "Role assignment controls are active for all organization members.",
     "Audit log monitoring is enabled for platform configuration changes.",
     "Security overview indicates no elevated administrative anomalies.",
   ];
-  const contentAreas = contentAreaList;
-
-  useEffect(() => {
-    setConsultationStatuses(Object.fromEntries(state.leads.map((lead) => [lead.id, lead.stage])));
-    setConsultationOwners(Object.fromEntries(state.leads.map((lead) => [lead.id, lead.owner])));
-  }, [state.leads]);
-
-  const submitReply = (ticketId: string) => {
-    const text = replyDrafts[ticketId]?.trim();
-    if (!text) return;
-    addTicketReply(ticketId, text);
-    setReplyDrafts((prev) => ({ ...prev, [ticketId]: "" }));
+  const clientAccounts = state.users.filter((user) => user.role === "client");
+  const workspaceOwner = currentUser ?? state.users.find((user) => user.role === "admin") ?? null;
+  const testimonialHighlights = [
+    "Migration delivery felt structured and predictable from kickoff to post-cutover support.",
+    "Response quality stayed consistent across onboarding, governance, and daily operations.",
+    "KollraX translated technical Microsoft 365 work into clear business outcomes.",
+  ];
+  const viewMeta: Record<AdminView, { group: string; title: string; subtitle: string }> = {
+    overview: {
+      group: "Core Navigation",
+      title: "Overview",
+      subtitle: "A simple admin summary of revenue, workspace status, billing, and recent activity.",
+    },
+    workspace: {
+      group: "Core Navigation",
+      title: "Workspace",
+      subtitle: "Manage the current admin workspace, owner profile, and simple operational settings.",
+    },
+    clients: {
+      group: "Kiretivs",
+      title: "Clients",
+      subtitle: "Review the client organizations currently stored in the workspace.",
+    },
+    testimonials: {
+      group: "Kiretivs",
+      title: "Testimonials",
+      subtitle: "Keep track of proof points and social proof content used across the product.",
+    },
+    "audit-logs": {
+      group: "System Management",
+      title: "Audit Logs",
+      subtitle: "View the most recent actions recorded across tickets and admin activity.",
+    },
+    notifications: {
+      group: "System Management",
+      title: "Notifications",
+      subtitle: "Monitor broadcast and alert readiness for the workspace.",
+    },
+    "activity-monitoring": {
+      group: "System Management",
+      title: "Activity Monitoring",
+      subtitle: "Track workspace activity, ticket updates, and current operational movement.",
+    },
+    "platform-settings": {
+      group: "System Management",
+      title: "Platform Settings",
+      subtitle: "Keep the lightweight admin setup aligned with the current product scope.",
+    },
   };
+  const activeViewMeta = viewMeta[activeView];
 
   const toggleGroup = (group: keyof typeof collapsedGroups) => {
     setCollapsedGroups((prev) => ({ ...prev, [group]: !prev[group] }));
-  };
-
-  const savePermissionPreset = (userId: string) => {
-    setAdminNotice(`Permissions updated for ${state.users.find((user) => user.id === userId)?.fullName ?? "user"}.`);
-  };
-
-  const updateConsultation = (leadId: string) => {
-    updateLeadPipeline(leadId, {
-      stage: consultationStatuses[leadId],
-      owner: consultationOwners[leadId] ?? "Unassigned",
-    });
-    setAdminNotice(`Lead ${leadId} updated to ${consultationStatuses[leadId]} under ${consultationOwners[leadId] ?? "Unassigned"}.`);
   };
 
   const applyPaymentAction = (invoiceId: string, action: "capture" | "remind" | "retry") => {
@@ -2642,26 +2599,6 @@ function AdminDashboard() {
       retry: "Retry payment flow started.",
     };
     setAdminNotice(`${invoiceId}: ${actionMap[action]}`);
-  };
-
-  const sendNotification = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!notificationDraft.title.trim() || !notificationDraft.message.trim()) return;
-    setSentNotifications((prev) => [
-      {
-        id: createId("notice"),
-        title: notificationDraft.title.trim(),
-        message: notificationDraft.message.trim(),
-        audience: notificationDraft.audience,
-      },
-      ...prev,
-    ]);
-    setNotificationDraft({ title: "", message: "", audience: "All workspace users" });
-    setAdminNotice("Notification created and added to the admin feed.");
-  };
-
-  const saveContentArea = () => {
-    setAdminNotice(`${activeContentArea} content draft saved.`);
   };
 
   return (
@@ -2690,11 +2627,8 @@ function AdminDashboard() {
               </button>
               {!collapsedGroups.primary && (
                 <div className="mt-2 space-y-1.5">
-                  <AdminNavItem icon={LayoutDashboard} label="Overview" active />
-                  <AdminNavItem icon={CreditCard} label="Cards" />
-                  <AdminNavItem icon={Users} label="Active Users" />
-                  <AdminNavItem icon={Workflow} label="Configuration" />
-                  <AdminNavItem icon={Wallet} label="Subscription" />
+                  <AdminNavItem icon={LayoutDashboard} label="Overview" active={activeView === "overview"} onClick={() => setActiveView("overview")} />
+                  <AdminNavItem icon={Settings2} label="Workspace" active={activeView === "workspace"} onClick={() => setActiveView("workspace")} />
                 </div>
               )}
             </div>
@@ -2706,9 +2640,8 @@ function AdminDashboard() {
               </button>
               {!collapsedGroups.kiretivs && (
                 <div className="mt-2 space-y-1.5">
-                  <AdminNavItem icon={FolderOpen} label="Clients" />
-                  <AdminNavItem icon={Bot} label="Content Management" />
-                  <AdminNavItem icon={Sparkles} label="Testimonials" />
+                  <AdminNavItem icon={FolderOpen} label="Clients" active={activeView === "clients"} onClick={() => setActiveView("clients")} />
+                  <AdminNavItem icon={Sparkles} label="Testimonials" active={activeView === "testimonials"} onClick={() => setActiveView("testimonials")} />
                 </div>
               )}
             </div>
@@ -2720,10 +2653,10 @@ function AdminDashboard() {
               </button>
               {!collapsedGroups.system && (
                 <div className="mt-2 space-y-1.5">
-                  <AdminNavItem icon={Workflow} label="Audit Logs" />
-                  <AdminNavItem icon={Bell} label="Notifications" />
-                  <AdminNavItem icon={Activity} label="Activity Monitoring" />
-                  <AdminNavItem icon={Settings2} label="Platform Settings" />
+                  <AdminNavItem icon={Workflow} label="Audit Logs" active={activeView === "audit-logs"} onClick={() => setActiveView("audit-logs")} />
+                  <AdminNavItem icon={Bell} label="Notifications" active={activeView === "notifications"} onClick={() => setActiveView("notifications")} />
+                  <AdminNavItem icon={Activity} label="Activity Monitoring" active={activeView === "activity-monitoring"} onClick={() => setActiveView("activity-monitoring")} />
+                  <AdminNavItem icon={Settings2} label="Platform Settings" active={activeView === "platform-settings"} onClick={() => setActiveView("platform-settings")} />
                 </div>
               )}
             </div>
@@ -2740,9 +2673,9 @@ function AdminDashboard() {
                 <div className="admin-search-field w-full max-w-md">
                   <Search className="h-4 w-4 text-[#103678]/40" />
                   <input
-                    value={userSearch}
-                    onChange={(event) => setUserSearch(event.target.value)}
-                    placeholder="Search..."
+                    readOnly
+                    value="Admin workspace overview"
+                    placeholder="Admin workspace overview"
                     className="w-full bg-transparent text-sm text-[#103678] outline-none placeholder:text-[#103678]/32"
                   />
                 </div>
@@ -2752,10 +2685,6 @@ function AdminDashboard() {
                     Admin accounts
                   </button>
                   <button className="admin-toolbar-icon"><ReceiptText className="h-4 w-4" /></button>
-                  <button className="admin-toolbar-icon relative">
-                    <Bell className="h-4 w-4" />
-                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#ff5f6d] px-1 text-[10px] text-white">1</span>
-                  </button>
                   <button className="admin-toolbar-icon"><Settings2 className="h-4 w-4" /></button>
                   {currentUser && <ProfileAvatar user={currentUser} />}
                 </div>
@@ -2766,14 +2695,15 @@ function AdminDashboard() {
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <div className="flex items-center gap-2 text-sm text-[#103678]/54">
-                    <span>Dashboard</span>
+                    <span>{activeViewMeta.group}</span>
                     <span>/</span>
-                    <span className="rounded-full bg-white/80 px-2 py-1 text-[11px] text-[#103678]/82">Overview</span>
+                    <span className="rounded-full bg-white/80 px-2 py-1 text-[11px] text-[#103678]/82">{activeViewMeta.title}</span>
                   </div>
-                  <h2 className="mt-2 text-[1.55rem] font-semibold text-[#103678]">Dashboard</h2>
+                  <h2 className="mt-2 text-[1.55rem] font-semibold text-[#103678]">{activeViewMeta.title}</h2>
+                  <p className="mt-2 max-w-3xl text-sm text-[#103678]/58">{activeViewMeta.subtitle}</p>
                 </div>
                 <button className="admin-primary-button">
-                  <LayoutDashboard className="h-4 w-4" /> Overview
+                  <LayoutDashboard className="h-4 w-4" /> {activeViewMeta.title}
                 </button>
               </div>
               {adminNotice && (
@@ -2782,21 +2712,76 @@ function AdminDashboard() {
                 </div>
               )}
 
+              {activeView === "overview" && (
               <motion.section variants={staggerReveal} initial="hidden" animate="visible" className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-[1.55fr_0.6fr_0.9fr]">
                 <motion.div variants={fadeInUp} className="admin-panel rounded-[1.35rem] p-4 md:col-span-2 xl:col-span-1">
-                  <div className="flex items-center justify-between gap-3">
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div>
                       <p className="text-lg font-semibold text-[#103678]">Revenue Metrics</p>
-                      <p className="mt-1 text-[2.2rem] font-semibold text-[#103678]">{formatCurrency(monthlyRecurringRevenue)}</p>
-                      <p className="text-sm text-[#103678]/46">Total MRR</p>
+                      <p className="mt-1 text-[2.2rem] font-semibold text-[#103678]">{revenueChart.formatter(selectedRevenuePoint?.value ?? monthlyRecurringRevenue)}</p>
+                      <p className="text-sm text-[#103678]/46">
+                        {selectedRevenuePoint?.label} · {revenueChart.amountLabel}
+                      </p>
                     </div>
-                    <button className="admin-secondary-button">
-                      <LineChart className="h-4 w-4" /> Interactive Chart
-                    </button>
+                    <div className="flex flex-wrap gap-2">
+                      {([
+                        { key: "mrr", label: "MRR" },
+                        { key: "arr", label: "ARR" },
+                        { key: "clients", label: "Clients" },
+                      ] as const).map((option) => (
+                        <button
+                          key={option.key}
+                          onClick={() => setRevenueView(option.key)}
+                          className={cn(
+                            "admin-table-action",
+                            revenueView === option.key && "border-[#74b4d9]/45 bg-[linear-gradient(135deg,rgba(116,180,217,0.24),rgba(255,255,255,0.96))] text-[#103678]"
+                          )}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                      {(["6m", "12m"] as const).map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => setRevenueWindow(option)}
+                          className={cn(
+                            "admin-secondary-button",
+                            revenueWindow === option && "border-[#74b4d9]/45 bg-[linear-gradient(135deg,rgba(116,180,217,0.24),rgba(255,255,255,0.96))] text-[#103678]"
+                          )}
+                        >
+                          <LineChart className="h-4 w-4" /> {option}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div className="mt-4 rounded-[1rem] border border-[#103678]/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(237,243,248,0.95))] p-3">
+                    <div className="mb-4 grid gap-3 sm:grid-cols-3">
+                      <div className="rounded-[0.95rem] border border-[#103678]/8 bg-white/80 px-3 py-3">
+                        <p className="text-[11px] uppercase tracking-[0.18em] text-[#103678]/38">Current</p>
+                        <p className="mt-2 text-lg font-semibold text-[#103678]">{revenueChart.formatter(revenueChart.points[revenueChart.points.length - 1]?.value ?? 0)}</p>
+                      </div>
+                      <div className="rounded-[0.95rem] border border-[#103678]/8 bg-white/80 px-3 py-3">
+                        <p className="text-[11px] uppercase tracking-[0.18em] text-[#103678]/38">Change</p>
+                        <p className={cn("mt-2 text-lg font-semibold", revenueChart.deltaValue >= 0 ? "text-emerald-700" : "text-rose-600")}>
+                          {revenueChart.deltaValue >= 0 ? "+" : ""}
+                          {revenueChart.formatter(revenueChart.deltaValue)}
+                        </p>
+                      </div>
+                      <div className="rounded-[0.95rem] border border-[#103678]/8 bg-white/80 px-3 py-3">
+                        <p className="text-[11px] uppercase tracking-[0.18em] text-[#103678]/38">Trend</p>
+                        <p className={cn("mt-2 text-lg font-semibold", revenueChart.deltaPercent >= 0 ? "text-emerald-700" : "text-rose-600")}>
+                          {revenueChart.deltaPercent >= 0 ? "+" : ""}
+                          {revenueChart.deltaPercent.toFixed(1)}%
+                        </p>
+                      </div>
+                    </div>
                     <div className="relative h-40 overflow-hidden rounded-[0.95rem]">
                       <div className="absolute inset-0 admin-chart-grid" />
+                      <div className="pointer-events-none absolute inset-y-3 left-0 flex flex-col justify-between text-[10px] text-[#103678]/28">
+                        <span>{revenueChart.formatter(revenueChart.maxValue)}</span>
+                        <span>{revenueChart.formatter(Math.round((revenueChart.maxValue + revenueChart.minValue) / 2))}</span>
+                        <span>{revenueChart.formatter(revenueChart.minValue)}</span>
+                      </div>
                       <svg viewBox="0 0 520 170" className="absolute inset-0 h-full w-full">
                         <defs>
                           <linearGradient id="kollraxRevenueLine" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -2815,22 +2800,62 @@ function AdminDashboard() {
                             </feMerge>
                           </filter>
                         </defs>
-                        <path d={chartAreaPath} fill="url(#kollraxRevenueFill)" />
-                        <path d={chartPath} fill="none" stroke="url(#kollraxRevenueLine)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" filter="url(#kollraxGlow)" />
-                        {chartPoints.map((point, index) => {
-                          const [x, y] = point.split(",");
+                        <path d={revenueChart.areaPath} fill="url(#kollraxRevenueFill)" />
+                        <path d={revenueChart.path} fill="none" stroke="url(#kollraxRevenueLine)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" filter="url(#kollraxGlow)" />
+                        {selectedRevenuePoint && (
+                          <>
+                            <line
+                              x1={selectedRevenuePoint.x}
+                              x2={selectedRevenuePoint.x}
+                              y1="18"
+                              y2="160"
+                              stroke="rgba(16,54,120,0.18)"
+                              strokeDasharray="4 4"
+                            />
+                            <rect
+                              x={Math.max(8, Math.min(selectedRevenuePoint.x - 62, 520 - 124))}
+                              y="12"
+                              width="124"
+                              height="44"
+                              rx="12"
+                              fill="rgba(255,255,255,0.96)"
+                              stroke="rgba(16,54,120,0.09)"
+                            />
+                            <text x={Math.max(18, Math.min(selectedRevenuePoint.x - 50, 520 - 114))} y="30" fill="#103678" fontSize="11" fontWeight="600">
+                              {selectedRevenuePoint.label}
+                            </text>
+                            <text x={Math.max(18, Math.min(selectedRevenuePoint.x - 50, 520 - 114))} y="46" fill="#1d81e4" fontSize="12" fontWeight="700">
+                              {revenueChart.formatter(selectedRevenuePoint.value)}
+                            </text>
+                          </>
+                        )}
+                        {revenueChart.points.map((point, index) => {
                           return (
-                            <g key={index}>
-                              <circle cx={x} cy={y} r="6" fill="rgba(73,216,255,0.18)" />
-                              <circle cx={x} cy={y} r="3.5" fill="#68dcff" />
+                            <g key={`${point.label}-${index}`}>
+                              <rect
+                                x={point.x - 20}
+                                y="0"
+                                width="40"
+                                height="170"
+                                fill="transparent"
+                                onMouseEnter={() => setActiveRevenuePoint(index)}
+                              />
+                              <circle cx={point.x} cy={point.y} r={activeRevenuePoint === index ? "10" : "6"} fill="rgba(73,216,255,0.16)" />
+                              <circle cx={point.x} cy={point.y} r={activeRevenuePoint === index ? "5" : "3.5"} fill={activeRevenuePoint === index ? "#1471ff" : "#68dcff"} />
                             </g>
                           );
                         })}
                       </svg>
                     </div>
-                    <div className="mt-3 grid grid-cols-10 text-center text-[11px] text-[#103678]/35">
-                      {chartLabels.map((label) => (
-                        <span key={label}>{label}</span>
+                    <div className={cn("mt-3 grid text-center text-[11px] text-[#103678]/35", revenueWindow === "12m" ? "grid-cols-12" : "grid-cols-6")}>
+                      {revenueChart.labels.map((label, index) => (
+                        <button
+                          key={`${label}-${index}`}
+                          onMouseEnter={() => setActiveRevenuePoint(index)}
+                          className={cn("rounded-md px-1 py-1 transition", activeRevenuePoint === index && "bg-white/80 text-[#103678]")}
+                        >
+                          {label}
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -2840,13 +2865,13 @@ function AdminDashboard() {
                   <p className="text-lg font-semibold text-[#103678]">Active Users</p>
                   <div className="mt-6 space-y-6">
                     <div>
-                      <p className="text-[2rem] font-semibold text-[#103678]">{state.users.length + 291}</p>
-                      <p className="text-sm text-[#103678]/44">Enterprise Accounts</p>
+                      <p className="text-[2rem] font-semibold text-[#103678]">{state.users.length}</p>
+                      <p className="text-sm text-[#103678]/44">Registered Accounts</p>
                     </div>
                     <div className="h-px bg-[#103678]/8" />
                     <div>
-                      <p className="text-[2rem] font-semibold text-[#103678]">{activeClients + 255}</p>
-                      <p className="text-sm text-[#103678]/44">Individual Users</p>
+                      <p className="text-[2rem] font-semibold text-[#103678]">{activeClients}</p>
+                      <p className="text-sm text-[#103678]/44">Client Organizations</p>
                     </div>
                   </div>
                 </motion.div>
@@ -2854,252 +2879,67 @@ function AdminDashboard() {
                 <motion.div variants={fadeInUp} className="admin-panel rounded-[1.35rem] p-4 md:col-span-2 xl:col-span-1">
                   <p className="text-lg font-semibold text-[#103678]">Subscriptions Overview</p>
                   <div className="mt-5 space-y-5">
-                    {subscriptionPlans.map((plan) => (
-                      <div key={plan.plan}>
-                        <div className="mb-2 flex items-center justify-between gap-3 text-sm">
-                          <span className="text-[#103678]/88">{plan.plan}</span>
-                          <span className="text-[#103678]/32">Renewal Tried</span>
-                        </div>
-                        <div className="h-2 overflow-hidden rounded-full bg-[#103678]/8">
-                          <div className="h-full rounded-full bg-[linear-gradient(90deg,#1d81e4,#48d1ff)]" style={{ width: `${plan.health * 100}%` }} />
-                        </div>
+                    {subscriptionPlans.length === 0 ? (
+                      <div className="rounded-[1rem] border border-dashed border-[#103678]/14 bg-white/65 px-4 py-6 text-sm text-[#103678]/58">
+                        No subscription data yet. Plans and renewal health will appear here once real records are available.
                       </div>
-                    ))}
-                    <div className="flex items-center justify-between rounded-xl border border-[#1d81e4]/18 bg-[#f6fbff] px-3 py-2">
-                      <span className="text-sm text-[#103678]/80">Renewal Status</span>
-                      <span className="rounded-full bg-emerald-500/18 px-3 py-1 text-xs font-medium text-emerald-700">Renewed</span>
-                    </div>
+                    ) : (
+                      subscriptionPlans.map((plan) => (
+                        <div key={plan.plan}>
+                          <div className="mb-2 flex items-center justify-between gap-3 text-sm">
+                            <span className="text-[#103678]/88">{plan.plan}</span>
+                            <span className="text-[#103678]/32">{plan.health === 1 ? "Active" : "Inactive"}</span>
+                          </div>
+                          <div className="h-2 overflow-hidden rounded-full bg-[#103678]/8">
+                            <div className="h-full rounded-full bg-[linear-gradient(90deg,#1d81e4,#48d1ff)]" style={{ width: `${plan.health * 100}%` }} />
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </motion.div>
               </motion.section>
+              )}
 
-              <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-[1.2fr_1fr_0.58fr]">
-                <div className="admin-panel rounded-[1.35rem] p-4 md:col-span-2 xl:col-span-1">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-lg font-semibold text-[#103678]">Support Ticket Statistics</p>
-                    <MoreHorizontal className="h-4 w-4 text-[#103678]/40" />
-                  </div>
-                  <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_0.64fr]">
-                    <div className="rounded-[1rem] border border-[#103678]/8 bg-white/70 p-3">
-                      <div className="flex h-40 items-end gap-4">
-                        {[86, 24, 88, 136, 148, 52].map((open, index) => (
-                          <div key={index} className="flex flex-1 items-end justify-center gap-1">
-                            <div className="w-3 rounded-t bg-[#1471ff]" style={{ height: `${open}px` }} />
-                            <div className="w-3 rounded-t bg-[#49d8ff]" style={{ height: `${[134, 65, 168, 112, 48, 18][index]}px` }} />
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-3 grid grid-cols-6 text-center text-[11px] text-[#103678]/35">
-                        {["Sun", "Mon", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-                          <span key={day}>{day}</span>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-[#103678]">Recent Support Activity</p>
-                      <div className="mt-3 space-y-3">
-                        {state.tickets.slice(0, 4).map((ticket, index) => (
-                          <div key={ticket.id} className="flex gap-3 rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
-                            <div className={`mt-1 flex h-8 w-8 items-center justify-center rounded-full ${index % 2 === 0 ? "bg-[#43284e]" : "bg-[#4e3d18]"}`}>
-                              <LifeBuoy className="h-4 w-4 text-[#ffb26b]" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-[#103678]">Recent Support Activity</p>
-                              <p className="mt-1 text-xs text-[#103678]/52">{ticket.subject}</p>
-                              <p className="mt-1 text-xs text-[#103678]/35">Last Support - {index + 1} hours ago</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
+              {activeView === "overview" && (
+              <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-[0.42fr_0.78fr]">
                 <div className="admin-panel rounded-[1.35rem] p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-lg font-semibold text-[#103678]">Service Activity Monitoring</p>
-                      <p className="mt-1 text-sm text-[#103678]/38">Track Microsoft 365 services across the platform.</p>
-                    </div>
-                    <MoreHorizontal className="h-4 w-4 text-[#103678]/40" />
-                  </div>
-                  <div className="mt-5 space-y-4">
-                    {[
-                      { icon: Cloud, title: "Migration Requests", meta: "9 migrated", progress: 0.82 },
-                      { icon: CheckCircle2, title: "Deployment Status", meta: "Migration deployed", progress: 0.93 },
-                      { icon: Workflow, title: "Onboarding Workflow", meta: "2 Progress", progress: 0.74 },
-                    ].map((item) => (
-                      <div key={item.title} className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#e8f3fb] text-[#1d81e4]">
-                            <item.icon className="h-4 w-4" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between gap-3">
-                              <p className="text-sm font-medium text-[#103678]">{item.title}</p>
-                              <span className="text-xs text-[#103678]/46">{item.meta}</span>
-                            </div>
-                            <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#103678]/8">
-                              <div className="h-full rounded-full bg-[linear-gradient(90deg,#1466cd,#4ad5ff)]" style={{ width: `${item.progress * 100}%` }} />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="admin-panel rounded-[1.35rem] p-4 md:col-span-2 xl:col-span-1">
-                  <p className="text-lg font-semibold text-[#103678]">Quick Action Panel</p>
-                  <div className="mt-4 space-y-3">
-                    {["Common tasks", "Creates all export", "New development", "Common navigation", "Quick Action Panel"].map((label) => (
-                      <button key={label} className="admin-quick-row">
-                        <span className="text-sm text-[#103678]/82">{label}</span>
-                        <ChevronRight className="h-4 w-4 text-[#103678]/34" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-[1.4fr_0.32fr_0.78fr]">
-                <div className="admin-panel rounded-[1.35rem] p-4 md:col-span-2 xl:col-span-1">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-lg font-semibold text-[#103678]">Data Table Management</p>
-                    <MoreHorizontal className="h-4 w-4 text-[#103678]/40" />
-                  </div>
-                  <div className="mt-4 flex flex-col gap-3 lg:flex-row">
-                    <div className="admin-table-search">
-                      <Search className="h-4 w-4 text-[#103678]/34" />
-                      <input
-                        value={userSearch}
-                        onChange={(event) => setUserSearch(event.target.value)}
-                        placeholder="Search"
-                        className="w-full bg-transparent text-sm text-[#103678] outline-none placeholder:text-[#103678]/26"
-                      />
-                    </div>
-                    <button className="admin-table-action"><Filter className="h-4 w-4" /> Filter</button>
-                    <select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value as "all" | UserRole)} className="admin-table-action">
-                      <option value="all">Account Status</option>
-                      <option value="client">Client</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                  </div>
-                  <div className="mt-4 overflow-auto">
-                    <table className="min-w-full text-left text-sm text-[#103678]/74">
-                      <thead className="text-[#103678]/34">
-                        <tr>
-                          <th className="px-3 py-2">Name</th>
-                          <th className="px-3 py-2">User ID</th>
-                          <th className="px-3 py-2">Client</th>
-                          <th className="px-3 py-2">Role</th>
-                          <th className="px-3 py-2">Account Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredUsers.map((user) => (
-                          <tr key={user.id} className="border-t border-[#103678]/6">
-                            <td className="px-3 py-3">
-                              <div className="flex items-center gap-3">
-                                <ProfileAvatar user={user} size="sm" />
-                                <span className="text-[#103678]">{user.fullName}</span>
-                              </div>
-                            </td>
-                            <td className="px-3 py-3 font-medium text-[#103678]/78">{user.memberCode}</td>
-                            <td className="px-3 py-3 text-[#103678]/54">{user.company}</td>
-                            <td className="px-3 py-3">
-                              <select value={userRoles[user.id]} onChange={(event) => setUserRoles((prev) => ({ ...prev, [user.id]: event.target.value as UserRole }))} className="admin-inline-select">
-                                <option value="client">Assignment</option>
-                                <option value="admin">Admin</option>
-                              </select>
-                            </td>
-                            <td className="px-3 py-3">
-                              <div className="flex items-center gap-2">
-                                <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                                <select value={accountStatuses[user.id]} onChange={(event) => setAccountStatuses((prev) => ({ ...prev, [user.id]: event.target.value as "Required" | "Review" | "Paused" }))} className="bg-transparent text-sm text-[#103678] outline-none">
-                                  <option>Required</option>
-                                  <option>Review</option>
-                                  <option>Paused</option>
-                                </select>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div className="admin-panel rounded-[1.35rem] p-4">
-                  <p className="text-lg font-semibold text-[#103678]">Identity and Access</p>
-                  <div className="mt-4 space-y-3">
-                    <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-sm text-[#103678]/72">Issued user IDs</span>
-                        <span className="text-sm font-semibold text-[#103678]">{state.users.length}</span>
-                      </div>
-                    </div>
-                    <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-sm text-[#103678]/72">Profiles with avatar</span>
-                        <span className="text-sm font-semibold text-[#103678]">{usersWithAvatars}</span>
-                      </div>
-                    </div>
-                    <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-sm text-[#103678]/72">Admin accounts</span>
-                        <span className="text-sm font-semibold text-[#103678]">{adminUsers}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-4 space-y-2">
-                    {newestUsers.map((user) => (
-                      <div key={user.id} className="flex items-center gap-3 rounded-[1rem] border border-[#103678]/8 bg-white/72 px-3 py-3">
-                        <ProfileAvatar user={user} size="sm" />
+                  <p className="text-lg font-semibold text-[#103678]">Admin Workspace</p>
+                  {currentUser ? (
+                    <>
+                      <div className="mt-4 flex items-center gap-3 rounded-[1rem] border border-[#103678]/8 bg-white/72 px-3 py-3">
+                        <ProfileAvatar user={currentUser} size="sm" />
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-[#103678]">{user.fullName}</p>
-                          <p className="text-xs text-[#103678]/55">{user.memberCode}</p>
+                          <p className="truncate text-sm font-medium text-[#103678]">{currentUser.fullName}</p>
+                          <p className="text-xs text-[#103678]/55">{currentUser.memberCode}</p>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                  <div className="mt-4 space-y-3">
-                    <p className="text-sm font-semibold text-[#103678]">Permissions management</p>
-                    {filteredUsers.slice(0, 3).map((user) => (
-                      <div key={user.id} className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <ProfileAvatar user={user} size="sm" />
-                            <div>
-                              <p className="text-sm font-medium text-[#103678]">{user.fullName}</p>
-                              <p className="text-xs text-[#103678]/55">{user.memberCode}</p>
-                            </div>
+                      <div className="mt-4 space-y-3">
+                        <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-sm text-[#103678]/72">Workspace owner</span>
+                            <span className="text-sm font-semibold text-[#103678]">1 admin</span>
                           </div>
-                          <button onClick={() => savePermissionPreset(user.id)} className="admin-table-action">Save</button>
                         </div>
-                        <div className="mt-3 grid grid-cols-2 gap-2 text-sm text-[#103678]/76">
-                          {(["billing", "support", "content", "system"] as const).map((permission) => (
-                            <label key={permission} className="flex items-center gap-2 rounded-xl border border-[#103678]/8 bg-white/82 px-3 py-2">
-                              <input
-                                type="checkbox"
-                                checked={permissionMatrix[user.id]?.[permission] ?? false}
-                                onChange={(event) =>
-                                  setPermissionMatrix((prev) => ({
-                                    ...prev,
-                                    [user.id]: {
-                                      ...prev[user.id],
-                                      [permission]: event.target.checked,
-                                    },
-                                  }))
-                                }
-                              />
-                              <span className="capitalize">{permission}</span>
-                            </label>
-                          ))}
+                        <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-sm text-[#103678]/72">Profile image</span>
+                            <span className="text-sm font-semibold text-[#103678]">{usersWithAvatars > 0 ? "Uploaded" : "Not set"}</span>
+                          </div>
+                        </div>
+                        <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-sm text-[#103678]/72">Access level</span>
+                            <span className="text-sm font-semibold text-emerald-700">Full access</span>
+                          </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    </>
+                  ) : (
+                    <div className="mt-4 rounded-[1rem] border border-dashed border-[#103678]/14 bg-white/65 px-4 py-6 text-sm text-[#103678]/58">
+                      No admin account yet. Create the first account to initialize the workspace owner.
+                    </div>
+                  )}
                 </div>
 
                 <div className="admin-panel rounded-[1.35rem] p-4 md:col-span-2 xl:col-span-1">
@@ -3108,6 +2948,11 @@ function AdminDashboard() {
                     <MoreHorizontal className="h-4 w-4 text-[#103678]/40" />
                   </div>
                   <div className="mt-4 space-y-4">
+                    {recentActivities.length === 0 && (
+                      <div className="rounded-[1rem] border border-dashed border-[#103678]/14 bg-white/65 px-4 py-6 text-sm text-[#103678]/58">
+                        No admin activity yet.
+                      </div>
+                    )}
                     {recentActivities.map((item) => (
                       <div key={item.id} className="flex gap-3">
                         <div className="flex flex-col items-center">
@@ -3123,220 +2968,9 @@ function AdminDashboard() {
                   </div>
                 </div>
               </div>
+              )}
 
-              <div className="mt-4 grid gap-4 xl:grid-cols-[1.1fr_0.9fr_0.95fr]">
-                <div className="admin-panel rounded-[1.35rem] p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-lg font-semibold text-[#103678]">Consultations and Leads</p>
-                      <p className="mt-1 text-sm text-[#103678]/46">Smart intake submissions, qualification, and fast follow-up ownership.</p>
-                    </div>
-                    <button className="admin-secondary-button">
-                      <Users className="h-4 w-4" /> {activeClients} clients
-                    </button>
-                  </div>
-                  <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
-                      <p className="text-xs uppercase tracking-[0.18em] text-[#103678]/42">Consultations</p>
-                      <p className="mt-2 text-xl font-semibold text-[#103678]">{openConsultations}</p>
-                    </div>
-                    <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
-                      <p className="text-xs uppercase tracking-[0.18em] text-[#103678]/42">Open Tickets</p>
-                      <p className="mt-2 text-xl font-semibold text-[#103678]">{openTicketsCount}</p>
-                    </div>
-                    <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
-                      <p className="text-xs uppercase tracking-[0.18em] text-[#103678]/42">In Progress</p>
-                      <p className="mt-2 text-xl font-semibold text-[#103678]">{inProgressTicketsCount}</p>
-                    </div>
-                  </div>
-                  <div className="mt-4 space-y-3">
-                    {consultations.map((lead) => (
-                      <div key={lead.id} className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="text-sm font-medium text-[#103678]">{lead.name}</p>
-                            <p className="mt-1 text-xs text-[#103678]/52">{lead.company} · {lead.focus}</p>
-                          </div>
-                          <span className="rounded-full bg-[#74b4d9]/18 px-3 py-1 text-xs font-medium text-[#103678]">
-                            {consultationStatuses[lead.id] ?? lead.stage}
-                          </span>
-                        </div>
-                        <div className="mt-2 grid gap-1 text-sm text-[#103678]/68">
-                          <p>{lead.message}</p>
-                          <p>Phone: {lead.phone || "Not captured"} · Staff: {lead.staffSize}</p>
-                          <p>Budget: {lead.budgetRange} · Urgency: {lead.urgency}</p>
-                        </div>
-                        <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
-                          <select
-                            value={consultationStatuses[lead.id] ?? lead.stage}
-                            onChange={(event) =>
-                              setConsultationStatuses((prev) => ({
-                                ...prev,
-                                [lead.id]: event.target.value as LeadStage,
-                              }))
-                            }
-                            className="admin-inline-select"
-                          >
-                            <option value="New Lead">New Lead</option>
-                            <option value="Contacted">Contacted</option>
-                            <option value="Consultation Booked">Consultation Booked</option>
-                            <option value="Proposal Sent">Proposal Sent</option>
-                            <option value="Closed">Closed</option>
-                          </select>
-                          <input
-                            value={consultationOwners[lead.id] ?? lead.owner}
-                            onChange={(event) =>
-                              setConsultationOwners((prev) => ({
-                                ...prev,
-                                [lead.id]: event.target.value,
-                              }))
-                            }
-                            placeholder="Owner"
-                            className="admin-table-search"
-                          />
-                          <button onClick={() => updateConsultation(lead.id)} className="admin-table-action">Update</button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="admin-panel rounded-[1.35rem] p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-lg font-semibold text-[#103678]">Microsoft 365 Services</p>
-                      <p className="mt-1 text-sm text-[#103678]/46">Service requests, migration operations, deployment tracking, and onboarding workflow.</p>
-                    </div>
-                    <button className="admin-secondary-button">
-                      <Cloud className="h-4 w-4" /> {enabledServices}/{state.services.length} active
-                    </button>
-                  </div>
-                  <div className="mt-4 space-y-3">
-                    {state.services.map((service) => (
-                      <div key={service.id} className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="text-sm font-medium text-[#103678]">{service.title}</p>
-                            <p className="mt-1 text-xs text-[#103678]/54">{service.description}</p>
-                          </div>
-                          <button onClick={() => toggleService(service.id)} className="admin-table-action">
-                            {service.enabled ? "Enabled" : "Disabled"}
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="admin-panel rounded-[1.35rem] p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-lg font-semibold text-[#103678]">Notifications Center</p>
-                      <p className="mt-1 text-sm text-[#103678]/46">Announcements, alerts, platform notices, and admin follow-up triggers.</p>
-                    </div>
-                    <Bell className="h-4 w-4 text-[#103678]/40" />
-                  </div>
-                  <div className="mt-4 space-y-3">
-                    {notificationItems.map((item) => (
-                      <div key={item} className="rounded-[1rem] border border-[#103678]/8 bg-white/72 px-4 py-3 text-sm text-[#103678]/78">
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                  <form onSubmit={sendNotification} className="mt-4 grid gap-3">
-                    <input
-                      value={notificationDraft.title}
-                      onChange={(event) => setNotificationDraft((prev) => ({ ...prev, title: event.target.value }))}
-                      placeholder="Notification title"
-                      className="admin-table-search"
-                    />
-                    <select
-                      value={notificationDraft.audience}
-                      onChange={(event) => setNotificationDraft((prev) => ({ ...prev, audience: event.target.value }))}
-                      className="admin-inline-select"
-                    >
-                      <option>All workspace users</option>
-                      <option>Admins only</option>
-                      <option>Lead follow-up team</option>
-                    </select>
-                    <textarea
-                      value={notificationDraft.message}
-                      onChange={(event) => setNotificationDraft((prev) => ({ ...prev, message: event.target.value }))}
-                      placeholder="Compose a platform-wide notification"
-                      rows={3}
-                      className="dashboard-input rounded-2xl px-4 py-3 text-sm outline-none"
-                    />
-                    <button className="admin-primary-button" type="submit">
-                      <Mail className="h-4 w-4" /> Send notification
-                    </button>
-                  </form>
-                  <div className="mt-4 space-y-2">
-                    {sentNotifications.slice(0, 3).map((item) => (
-                      <div key={item.id} className="rounded-[1rem] border border-[#103678]/8 bg-white/72 px-4 py-3">
-                        <p className="text-sm font-semibold text-[#103678]">{item.title}</p>
-                        <p className="mt-1 text-sm text-[#103678]/68">{item.message}</p>
-                        <p className="mt-1 text-xs text-[#103678]/48">{item.audience}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-4 grid gap-4 xl:grid-cols-[1.25fr_1fr]">
-                <div className="admin-panel rounded-[1.35rem] p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-lg font-semibold text-[#103678]">Support Workflow</p>
-                    <MoreHorizontal className="h-4 w-4 text-[#103678]/40" />
-                  </div>
-                  <div className="mt-4 space-y-3">
-                    {state.tickets.map((ticket) => (
-                      <div key={ticket.id} className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
-                        <div className="flex flex-wrap items-center justify-between gap-3">
-                          <div>
-                            <p className="text-sm font-medium text-[#103678]">{ticket.subject}</p>
-                            <p className="mt-1 text-xs text-[#103678]/36">{ticket.id} - {ticket.priority} priority</p>
-                          </div>
-                          <select value={ticket.status} onChange={(event) => updateTicketStatus(ticket.id, event.target.value as TicketStatus)} className="admin-inline-select">
-                            <option>Open</option>
-                            <option>In Progress</option>
-                            <option>Resolved</option>
-                          </select>
-                        </div>
-                        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-                          <input
-                            value={replyDrafts[ticket.id] ?? ""}
-                            onChange={(event) => setReplyDrafts((prev) => ({ ...prev, [ticket.id]: event.target.value }))}
-                            placeholder="Add admin reply"
-                            className="admin-table-search"
-                          />
-                          <button onClick={() => submitReply(ticket.id)} className="admin-primary-button">Send reply</button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="admin-panel rounded-[1.35rem] p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-lg font-semibold text-[#103678]">Architecture Notes</p>
-                    <MoreHorizontal className="h-4 w-4 text-[#103678]/40" />
-                  </div>
-                  <div className="mt-4 space-y-3">
-                    {[
-                      "Paystack integration architecture",
-                      "Flutterwave integration architecture",
-                      "Recurring billing orchestration",
-                      "Microsoft 365 onboarding workflow",
-                      "Audit logs and notification system",
-                    ].map((item) => (
-                      <div key={item} className="rounded-[1rem] border border-[#103678]/8 bg-white/72 px-4 py-3 text-sm text-[#103678]/78">
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
+              {activeView === "overview" && (
               <div className="mt-4 grid gap-4 xl:grid-cols-[1fr_1fr_1fr]">
                 <div className="admin-panel rounded-[1.35rem] p-4">
                   <div className="flex items-center justify-between gap-3">
@@ -3347,6 +2981,11 @@ function AdminDashboard() {
                     <Wallet className="h-4 w-4 text-[#103678]/40" />
                   </div>
                   <div className="mt-4 space-y-3">
+                    {paymentRecords.length === 0 && (
+                      <div className="rounded-[1rem] border border-dashed border-[#103678]/14 bg-white/65 px-4 py-6 text-sm text-[#103678]/58">
+                        No billing records yet. Real invoices and payment events will appear here once connected.
+                      </div>
+                    )}
                     {paymentRecords.map((payment) => (
                       <div key={payment.id} className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
                         <div className="flex items-start justify-between gap-3">
@@ -3396,56 +3035,13 @@ function AdminDashboard() {
                       </div>
                     ))}
                   </div>
-                  <div className="mt-4 space-y-2">
-                    <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 px-4 py-3 text-sm text-[#103678]/78">Paystack integration architecture</div>
-                    <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 px-4 py-3 text-sm text-[#103678]/78">Flutterwave integration architecture</div>
-                    <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 px-4 py-3 text-sm text-[#103678]/78">Recurring billing management</div>
-                  </div>
-                </div>
-
-                <div className="admin-panel rounded-[1.35rem] p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-lg font-semibold text-[#103678]">Content Management</p>
-                      <p className="mt-1 text-sm text-[#103678]/46">Manage website content, testimonials, FAQs, service information, announcements, and blog architecture.</p>
-                    </div>
-                    <Bot className="h-4 w-4 text-[#103678]/40" />
-                  </div>
-                  <div className="mt-4 space-y-2">
-                    {contentAreas.map((item) => (
-                      <button
-                        key={item}
-                        onClick={() => setActiveContentArea(item)}
-                        className={cn("admin-vertical-link", activeContentArea === item && "border-[#74b4d9]/45 bg-[linear-gradient(135deg,rgba(116,180,217,0.24),rgba(255,255,255,0.9))]")}
-                      >
-                        {item}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="mt-4 rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
-                    <p className="text-sm font-semibold text-[#103678]">{activeContentArea}</p>
-                    <textarea
-                      value={contentEntries[activeContentArea]}
-                      onChange={(event) =>
-                        setContentEntries((prev) => ({
-                          ...prev,
-                          [activeContentArea]: event.target.value,
-                        }))
-                      }
-                      rows={6}
-                      className="dashboard-input mt-3 rounded-2xl px-4 py-3 text-sm outline-none"
-                    />
-                    <div className="mt-3 flex justify-end">
-                      <button onClick={saveContentArea} className="admin-primary-button">Save draft</button>
-                    </div>
-                  </div>
                 </div>
 
                 <div className="admin-panel rounded-[1.35rem] p-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-lg font-semibold text-[#103678]">System Management</p>
-                      <p className="mt-1 text-sm text-[#103678]/46">Audit logs, permissions, security overview, notification system, and platform settings.</p>
+                      <p className="mt-1 text-sm text-[#103678]/46">Audit logs, permissions, security overview, platform settings.</p>
                     </div>
                     <ShieldCheck className="h-4 w-4 text-[#103678]/40" />
                   </div>
@@ -3458,6 +3054,176 @@ function AdminDashboard() {
                   </div>
                 </div>
               </div>
+              )}
+
+              {activeView === "workspace" && (
+                <div className="mt-5 grid gap-4 lg:grid-cols-[0.72fr_1fr]">
+                  <div className="admin-panel rounded-[1.35rem] p-4">
+                    <p className="text-lg font-semibold text-[#103678]">Workspace Owner</p>
+                    {workspaceOwner ? (
+                      <div className="mt-4 flex items-center gap-3 rounded-[1rem] border border-[#103678]/8 bg-white/72 px-3 py-3">
+                        <ProfileAvatar user={workspaceOwner} size="sm" />
+                        <div>
+                          <p className="text-sm font-medium text-[#103678]">{workspaceOwner.fullName}</p>
+                          <p className="text-xs text-[#103678]/55">{workspaceOwner.email}</p>
+                          <p className="mt-1 text-xs text-[#103678]/48">{workspaceOwner.memberCode}</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mt-4 rounded-[1rem] border border-dashed border-[#103678]/14 bg-white/65 px-4 py-6 text-sm text-[#103678]/58">
+                        No admin account has been created yet.
+                      </div>
+                    )}
+                  </div>
+                  <div className="admin-panel rounded-[1.35rem] p-4">
+                    <p className="text-lg font-semibold text-[#103678]">Workspace Status</p>
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
+                        <p className="text-xs uppercase tracking-[0.18em] text-[#103678]/42">Accounts</p>
+                        <p className="mt-2 text-xl font-semibold text-[#103678]">{state.users.length}</p>
+                      </div>
+                      <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
+                        <p className="text-xs uppercase tracking-[0.18em] text-[#103678]/42">Profiles With Avatar</p>
+                        <p className="mt-2 text-xl font-semibold text-[#103678]">{usersWithAvatars}</p>
+                      </div>
+                      <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
+                        <p className="text-xs uppercase tracking-[0.18em] text-[#103678]/42">Services</p>
+                        <p className="mt-2 text-xl font-semibold text-[#103678]">{state.services.length}</p>
+                      </div>
+                      <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
+                        <p className="text-xs uppercase tracking-[0.18em] text-[#103678]/42">Workspace State</p>
+                        <p className="mt-2 text-xl font-semibold text-[#103678]">{state.users.length > 0 ? "Active" : "Empty"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeView === "clients" && (
+                <div className="mt-5 admin-panel rounded-[1.35rem] p-4">
+                  <p className="text-lg font-semibold text-[#103678]">Client Organizations</p>
+                  {clientAccounts.length === 0 ? (
+                    <div className="mt-4 rounded-[1rem] border border-dashed border-[#103678]/14 bg-white/65 px-4 py-6 text-sm text-[#103678]/58">
+                      No client organizations have been added yet.
+                    </div>
+                  ) : (
+                    <div className="mt-4 space-y-3">
+                      {clientAccounts.map((client) => (
+                        <div key={client.id} className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
+                          <p className="text-sm font-medium text-[#103678]">{client.company}</p>
+                          <p className="mt-1 text-xs text-[#103678]/55">{client.fullName} · {client.email}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeView === "testimonials" && (
+                <div className="mt-5 admin-panel rounded-[1.35rem] p-4">
+                  <p className="text-lg font-semibold text-[#103678]">Testimonial Library</p>
+                  <div className="mt-4 space-y-3">
+                    {testimonialHighlights.map((quote) => (
+                      <div key={quote} className="rounded-[1rem] border border-[#103678]/8 bg-white/72 px-4 py-4 text-sm text-[#103678]/78">
+                        {quote}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeView === "audit-logs" && (
+                <div className="mt-5 admin-panel rounded-[1.35rem] p-4">
+                  <p className="text-lg font-semibold text-[#103678]">Audit Log Feed</p>
+                  <div className="mt-4 space-y-4">
+                    {recentActivities.length === 0 ? (
+                      <div className="rounded-[1rem] border border-dashed border-[#103678]/14 bg-white/65 px-4 py-6 text-sm text-[#103678]/58">
+                        No audit log entries yet.
+                      </div>
+                    ) : (
+                      recentActivities.map((item) => (
+                        <div key={item.id} className="rounded-[1rem] border border-[#103678]/8 bg-white/72 px-4 py-4">
+                          <p className="text-sm font-medium text-[#103678]">{item.detail}</p>
+                          <p className="mt-1 text-xs text-[#103678]/48">{isoDate(item.createdAt)}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeView === "notifications" && (
+                <div className="mt-5 admin-panel rounded-[1.35rem] p-4">
+                  <p className="text-lg font-semibold text-[#103678]">Notifications</p>
+                  <div className="mt-4 rounded-[1rem] border border-dashed border-[#103678]/14 bg-white/65 px-4 py-6 text-sm text-[#103678]/58">
+                    Notification broadcasting is not configured in this lightweight admin workspace yet.
+                  </div>
+                </div>
+              )}
+
+              {activeView === "activity-monitoring" && (
+                <div className="mt-5 grid gap-4 lg:grid-cols-[0.42fr_0.78fr]">
+                  <div className="admin-panel rounded-[1.35rem] p-4">
+                    <p className="text-lg font-semibold text-[#103678]">Activity Summary</p>
+                    <div className="mt-4 space-y-3">
+                      <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-sm text-[#103678]/72">Ticket updates</span>
+                          <span className="text-sm font-semibold text-[#103678]">{recentActivities.length}</span>
+                        </div>
+                      </div>
+                      <div className="rounded-[1rem] border border-[#103678]/8 bg-white/72 p-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-sm text-[#103678]/72">Accounts</span>
+                          <span className="text-sm font-semibold text-[#103678]">{state.users.length}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="admin-panel rounded-[1.35rem] p-4">
+                    <p className="text-lg font-semibold text-[#103678]">Recent Activity</p>
+                    <div className="mt-4 space-y-4">
+                      {recentActivities.length === 0 ? (
+                        <div className="rounded-[1rem] border border-dashed border-[#103678]/14 bg-white/65 px-4 py-6 text-sm text-[#103678]/58">
+                          No monitored activity yet.
+                        </div>
+                      ) : (
+                        recentActivities.map((item) => (
+                          <div key={item.id} className="flex gap-3">
+                            <div className="flex flex-col items-center">
+                              <span className="mt-1 h-2.5 w-2.5 rounded-full bg-[#3e9cff]" />
+                              <span className="mt-2 h-full w-px bg-[#103678]/8" />
+                            </div>
+                            <div className="pb-2">
+                              <p className="text-sm font-medium text-[#103678]">Admin Action</p>
+                              <p className="mt-1 text-sm text-[#103678]/44">{item.detail}</p>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeView === "platform-settings" && (
+                <div className="mt-5 admin-panel rounded-[1.35rem] p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-lg font-semibold text-[#103678]">Platform Settings</p>
+                      <p className="mt-1 text-sm text-[#103678]/46">Current system guidance and workspace configuration notes.</p>
+                    </div>
+                    <ShieldCheck className="h-4 w-4 text-[#103678]/40" />
+                  </div>
+                  <div className="mt-4 space-y-3">
+                    {permissionItems.map((item) => (
+                      <div key={item} className="rounded-[1rem] border border-[#103678]/8 bg-white/72 px-4 py-3 text-sm text-[#103678]/78">
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
