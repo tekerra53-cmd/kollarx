@@ -9,6 +9,7 @@ from typing import Any
 from urllib.parse import quote
 
 from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask_cors import CORS
 from markupsafe import Markup
 from werkzeug.utils import secure_filename
 
@@ -622,6 +623,14 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "kollrax-dev-secret")
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
+# Configure CORS for API access from the frontend (Cloudflare Pages or other origins)
+allowed_origins = os.environ.get("ALLOWED_ORIGINS", "*")
+if allowed_origins.strip() == "*":
+    CORS(app, supports_credentials=True)
+else:
+    origins = [o.strip() for o in allowed_origins.split(",") if o.strip()]
+    CORS(app, origins=origins, supports_credentials=True)
+
 
 app.jinja_env.globals["icon"] = icon
 app.jinja_env.filters["format_date"] = format_date
@@ -634,6 +643,8 @@ def inject_globals() -> dict[str, Any]:
     return {
         "current_user": get_current_user(),
         "year": datetime.utcnow().year,
+        # API_BASE can be set via environment to the Railway or backend URL. Empty string uses relative URLs.
+        "API_BASE": os.environ.get("API_BASE", ""),
     }
 
 
