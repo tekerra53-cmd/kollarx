@@ -1,8 +1,10 @@
 name: Deploy to Railway
 
-on:
+'on':
   push:
-    branches: [ main, copilot-admin-update ]
+    branches:
+      - main
+      - copilot-admin-update
 
 jobs:
   deploy:

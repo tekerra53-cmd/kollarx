@@ -19,6 +19,11 @@ Cloudflare Pages setup (publish static/)
 2. In GitHub repository settings > Secrets, add the three Cloudflare secrets.
 3. The workflow `.github/workflows/deploy-cloudflare-pages.yml` will deploy `static/` on push.
 
+If you host the frontend separately from the Flask backend, set `API_BASE` in your backend environment to the Railway app URL, e.g. `https://your-app.up.railway.app`.
+Use `ALLOWED_ORIGINS` on the backend to permit the frontend origin, for example `https://www.kollrax.com`.
+
+The frontend also includes `static/js/api-config.js` as a safe fallback so `window.API_BASE` is always defined for client-side code.
+
 Railway setup (host Flask backend)
 
 1. On Railway, create a new project and connect your GitHub repository (or allow the GitHub Action to run).

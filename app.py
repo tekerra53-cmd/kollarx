@@ -620,7 +620,7 @@ def build_admin_context() -> dict[str, Any]:
 
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "kollrax-dev-secret")
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "69MA-s3papVHqng5RKgW-ilkZeBfzIltmV0y6N8LSTc")
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
 # Configure CORS for API access from the frontend (Cloudflare Pages or other origins)

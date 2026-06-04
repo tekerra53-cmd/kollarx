@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/kollrax-logo-site.png') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}" />
+    <script src="{{ url_for('static', filename='js/api-config.js') }}"></script>
     <script>
       // Expose API base URL to client scripts. Set via env `API_BASE` or empty for relative paths.
       window.API_BASE = {{ API_BASE|tojson }};
